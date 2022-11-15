@@ -1,11 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import axios from 'axios'
 import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { ChakraProvider } from '@chakra-ui/react'
+import enviromentConts from './constants/enviromentConts'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+axios.defaults.baseURL = enviromentConts.API_URL
+
 root.render(
   <React.StrictMode>
     <ChakraProvider>
