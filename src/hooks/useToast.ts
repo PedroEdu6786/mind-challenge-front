@@ -10,6 +10,14 @@ const toastBaseConfig = (message: string): UseToastOptions => ({
 const useToast = () => {
   const toast = useChakraToast()
 
+  const callAlertToast = (message: string) => {
+    return toast({
+      title: 'Warning',
+      status: 'warning',
+      ...toastBaseConfig(message),
+    })
+  }
+
   const callSuccessToast = (message: string) => {
     return toast({
       title: 'Success request',
@@ -26,7 +34,7 @@ const useToast = () => {
     })
   }
 
-  return { callFailToast, callSuccessToast }
+  return { callFailToast, callSuccessToast, callAlertToast }
 }
 
 export default useToast

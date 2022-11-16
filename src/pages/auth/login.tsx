@@ -1,18 +1,11 @@
 import { useForm } from 'react-hook-form'
-import {
-  Box,
-  Button,
-  Center,
-  FormLabel,
-  Image,
-  Input,
-  Stack,
-} from '@chakra-ui/react'
+import { Box, Button, Center, FormLabel, Input, Stack } from '@chakra-ui/react'
 import authService from '../../services/auth/authService'
 import { IAuthLogin } from '../../dtos/user'
 import useToast from '../../hooks/useToast'
 import { useNavigate } from 'react-router-dom'
 import useUserAuth from 'hooks/useUserAuth'
+import { Logo } from 'components/atoms/Logo'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -29,7 +22,7 @@ const Login = () => {
       callSuccessToast('User login has been successful')
       setUserData({ authToken, isAdmin })
 
-      isAdmin ? navigate('/dashboard') : navigate('/my-info')
+      navigate('/dashboard')
     } catch (err) {
       callFailToast('The was an error during the request')
     }
@@ -43,10 +36,7 @@ const Login = () => {
   return (
     <Center minH="600px" h="100vh">
       <Stack px="2rem" spacing="2rem">
-        <Image
-          src="https://uploads-ssl.webflow.com/5e94eacec7d8c21e2cbbe093/616f539cc4710faaaab29c20_mind-home_Logo-06.svg"
-          alt="Dan Abramov"
-        />
+        <Logo />
         <Stack
           as="form"
           spacing="2rem"

@@ -26,10 +26,16 @@ const useLocalStorage = (key, initialValue) => {
   }
 
   const setToValueStorage = (valueToStore) => {
-    localStorage.setItem(key, valueToStore)
     setStoredValue(valueToStore)
+    localStorage.setItem(key, JSON.stringify(valueToStore))
   }
-  return [storedValue, setValue]
+
+  const removeValueFromStore = () => {
+    setStoredValue(null)
+    localStorage.removeItem(key)
+  }
+
+  return [storedValue, setValue, removeValueFromStore]
 }
 
 export default useLocalStorage
