@@ -4,7 +4,7 @@ export interface IAuthLogin {
 }
 
 export interface IUserFetch {
-  id: number
+  id?: number
   token: string
 }
 

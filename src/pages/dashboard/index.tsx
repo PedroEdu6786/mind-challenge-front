@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <Center h="100%" p={{ base: '.25rem', sm: '.5rem', md: '2rem' }}>
+      <Center h="100%" >
         {userInfo && (
           <Stack
             width="80%"
