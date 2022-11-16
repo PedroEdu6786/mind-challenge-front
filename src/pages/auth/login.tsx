@@ -16,11 +16,9 @@ const Login = () => {
   const onSubmit = async (authData: IAuthLogin) => {
     const authSubmit = { authFormData: authData, remember: true }
     try {
-      const { token: authToken, isAdmin } = await authService.signInUser(
-        authSubmit
-      )
+      const loggedData = await authService.signInUser(authSubmit)
       callSuccessToast('User login has been successful')
-      setUserData({ authToken, isAdmin })
+      setUserData(loggedData)
 
       navigate('/dashboard')
     } catch (err) {

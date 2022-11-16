@@ -10,7 +10,11 @@ const signInUser = async ({ authFormData, config }: IAuthLoginAxios) => {
     const res = await axios.post('/auth/login', authFormData, config)
     const { data } = await res
 
-    return data
+    return {
+      token: data.token,
+      isAdmin: data.isAdmin,
+      userData: { email: data.email, id: data.userId },
+    }
   } catch (err) {
     throw new Error()
   }

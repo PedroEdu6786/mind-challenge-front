@@ -1,8 +1,13 @@
 import useLocalStorage from './useLocalStorage'
 
+interface IUserLogin {
+  id: number
+  email: string
+}
 interface IUseUserAuth {
-  authToken: string | undefined
+  token: string | undefined
   isAdmin: boolean
+  userData: IUserLogin
 }
 
 function useUserAuth(): [
@@ -10,25 +15,29 @@ function useUserAuth(): [
   (data: IUseUserAuth) => void,
   () => void
 ] {
-  const [authToken, setAuthToken, removeToken] = useLocalStorage(
-    'auth',
+  const [token, setToken, removeToken] = useLocalStorage('auth', undefined)
+  const [isAdmin, setIsAdmin, removeAdmin] = useLocalStorage('isAdmin', false)
+  const [userData, setUserData, removeUserData] = useLocalStorage(
+    'userData',
     undefined
   )
-  const [isAdmin, setIsAdmin, removeAdmin] = useLocalStorage('isAdmin', false)
 
-  const setUserToken = ({ authToken, isAdmin }: IUseUserAuth) => {
-    setAuthToken(authToken)
+  const setUserToken = ({ token, isAdmin, userData }: IUseUserAuth) => {
+    setToken(token)
     setIsAdmin(isAdmin)
+    setUserData(userData)
   }
 
   const logout = () => {
     removeAdmin()
     removeToken()
+    removeUserData()
     setIsAdmin(false)
-    setAuthToken(null)
+    setToken(null)
+    setUserData(null)
   }
 
-  return [{ authToken, isAdmin }, setUserToken, logout]
+  return [{ token, isAdmin, userData }, setUserToken, logout]
 }
 
 export default useUserAuth

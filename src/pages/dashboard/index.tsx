@@ -13,12 +13,13 @@ import { IUser } from 'dtos/user'
 const initialState: IUser = null
 
 const Dashboard = () => {
-  const [userData] = useUserAuth()
+  const [authData] = useUserAuth()
   const [userInfo, setUserInfo] = useState<IUser>(initialState)
   useProtectedRoute()
 
+  const { userData } = authData
   useEffect(() => {
-    const fetchData = { email: 'q@gmail.com', token: userData.authToken }
+    const fetchData = { id: userData.id, token: authData.token }
     if (!userInfo) {
       userService
         .fetchUser({ userData: fetchData, remember: true })
@@ -26,7 +27,7 @@ const Dashboard = () => {
           setUserInfo(data)
         })
     }
-  }, [userData, userInfo])
+  }, [userData, authData, userInfo])
 
   const parsedSkills = []
 
@@ -48,7 +49,7 @@ const Dashboard = () => {
                 boxSize={{ base: '150px', md: '200px', lg: '300px' }}
               />
               <Stack spacing=".1rem">
-                {userData.isAdmin && (
+                {authData.isAdmin && (
                   <Text
                     fontSize={{ base: 'sm', md: 'md' }}
                     fontWeight="semibold"
