@@ -1,8 +1,92 @@
-import { Stack } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Avatar, Center, Heading, Stack, Text } from '@chakra-ui/react'
+
+import DashboardLayout from 'components/templates/DashboardLayout'
+import useUserAuth from 'hooks/useUserAuth'
+import { UserPerk } from 'components/molecules/UserPerk'
+import { CvLink } from 'components/molecules/CvLink'
+import { UserSkills } from 'components/molecules/UserSkills'
+import { userService } from 'services/user'
+import useProtectedRoute from 'hooks/useProtectedRoute'
+import { IUser } from 'dtos/user'
+
+const initialState: IUser = null
 
 const Dashboard = () => {
-  return <Stack></Stack>
+  const [userData] = useUserAuth()
+  const [userInfo, setUserInfo] = useState<IUser>(initialState)
+  useProtectedRoute()
+
+  useEffect(() => {
+    const fetchData = { email: 'q@gmail.com', token: userData.authToken }
+    if (!userInfo) {
+      userService
+        .fetchUser({ userData: fetchData, remember: true })
+        .then((data: IUser) => {
+          setUserInfo(data)
+        })
+    }
+  }, [userData, userInfo])
+
+  const parsedSkills = []
+
+  return (
+    <DashboardLayout>
+      <Center h="100%" p={{ base: '.25rem', sm: '.5rem', md: '2rem' }}>
+        {userInfo && (
+          <Stack
+            width="80%"
+            maxW="650px"
+            justifyContent="space-between"
+            flexDirection={['column', 'row']}
+            spacing={{ base: '1rem', md: 0 }}
+          >
+            {/*  */}
+            <Stack>
+              <Avatar
+                src={`https://avatars.dicebear.com/api/jdenticon/${'tesft'}.svg`}
+                boxSize={{ base: '150px', md: '200px', lg: '300px' }}
+              />
+              <Stack spacing=".1rem">
+                {userData.isAdmin && (
+                  <Text
+                    fontSize={{ base: 'sm', md: 'md' }}
+                    fontWeight="semibold"
+                    color="red"
+                  >
+                    Admin
+                  </Text>
+                )}
+                <Heading as="h2" size="lg">
+                  {userInfo.name}
+                </Heading>
+                <Text>{userInfo.email}</Text>
+              </Stack>
+              <UserPerk
+                perkName="CV"
+                perkContent={<CvLink cvLink={userInfo.cvLink} />}
+              />
+            </Stack>
+
+            {/*  */}
+            <Stack spacing="1rem">
+              {/*  */}
+              <UserPerk
+                perkName="English Level"
+                perkContent={userInfo.englishLevel}
+              />
+              <UserPerk
+                perkName="Skills"
+                perkContent={<UserSkills skills={parsedSkills} />}
+              />
+              <UserPerk perkName="Team" perkContent={userInfo.team} />
+            </Stack>
+            {/*  */}
+          </Stack>
+        )}
+      </Center>
+    </DashboardLayout>
+  )
 }
 
 export default Dashboard
