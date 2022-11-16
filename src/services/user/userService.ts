@@ -7,7 +7,7 @@ export const userService = Object.freeze({
 
 const fetchUser = async ({ userData, config }: IUserFetchAxios) => {
   try {
-    const res = await axios.get('/users/23', {
+    const res = await axios.get(`/users/${userData.id}`, {
       headers: { Authorization: `Bearer ${userData.token}` },
     })
     const { data } = await res

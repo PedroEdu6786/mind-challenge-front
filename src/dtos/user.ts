@@ -4,8 +4,7 @@ export interface IAuthLogin {
 }
 
 export interface IUserFetch {
-  id?: string
-  email: string
+  id: number
   token: string
 }
 

@@ -9,7 +9,7 @@ const useProtectedRoute = () => {
   const { callAlertToast } = useToast()
 
   useEffect(() => {
-    if (!userToken.authToken) {
+    if (!userToken.token) {
       navigate('/auth/login')
       callAlertToast('Login to access page')
     }
