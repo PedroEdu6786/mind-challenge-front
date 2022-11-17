@@ -53,7 +53,13 @@ const DashboardLayout = ({ children }) => {
           Sign out
         </Button>
       </Stack>
-      <Stack alignSelf="start" w="100%" h="100vh">
+      <Stack
+        alignSelf="start"
+        w="100%"
+        h="100vh"
+        px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
+        py="3rem"
+      >
         {children}
       </Stack>
     </HStack>
