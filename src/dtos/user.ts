@@ -8,14 +8,24 @@ export interface IUserFetch {
   token: string
 }
 
+enum EnglishLevel {
+  beginner = 'beginner',
+  intermediate = 'intermediate',
+  advanced = 'advanced',
+}
+
 export interface IUser {
   id?: number
   name: string
   email: string
-  englishLevel: string
-  skills: string
-  cvLink: string
+  englishLevel?: EnglishLevel
+  skills?: string
+  cvLink?: string
   isAdmin: boolean
   isSuperadmin?: boolean
   team?: string
+}
+
+export interface IUserCreate extends IUser {
+  token: string
 }

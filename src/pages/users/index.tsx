@@ -17,45 +17,40 @@ import DashboardLayout from 'components/templates/DashboardLayout'
 import useAdminRoute from 'hooks/useAdminRoute'
 import { LIGHT_GRAY } from 'constants/colors'
 import useUserAuth from 'hooks/useUserAuth'
-import { accountService } from 'services/account/accountService'
-import AccountRegister from 'components/organisms/AccountRegister'
 import { Link } from 'components/atoms/Link'
+import UserRegister from 'components/organisms/UserRegister'
+import { userService } from 'services/user'
+import { IUser } from 'dtos/user'
 
-interface IAccount {
-  id: number
-  accountName: string
-  clientName: string
-  headOfOperation: string
-}
-
-const Account = () => {
+const User = () => {
   const [authData] = useUserAuth()
-  const [accountsInfo, setAccountsInfo] = useState<IAccount[]>(null)
+  const [userInfo, setUserInfo] = useState<IUser[]>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   useAdminRoute()
 
-  const { userData } = authData
+  const { userData: auth } = authData
+
   useEffect(() => {
-    if (!accountsInfo && userData) {
-      const fetchData = { token: authData.token }
-      accountService
-        .fetchAccounts({ userData: fetchData, remember: true })
-        .then((data: IAccount[]) => {
-          setAccountsInfo(data)
+    if (!userInfo && auth) {
+      const userData = { token: authData.token }
+      userService
+        .fetchAllUsers({ userData, remember: true })
+        .then((data: IUser[]) => {
+          setUserInfo(data)
         })
     }
-  }, [authData, accountsInfo, userData])
+  }, [authData, userInfo, auth])
 
   return (
     <DashboardLayout>
-      <AccountRegister isOpen={isOpen} onClose={onClose} />
+      <UserRegister isOpen={isOpen} onClose={onClose} />
       <Stack h="100%" spacing="2rem">
-        <Heading>Accounts</Heading>
+        <Heading>Users</Heading>
         <Button maxW="150px" colorScheme="twitter" onClick={onOpen}>
-          Add Account
+          Create User
         </Button>
-        {accountsInfo && (
+        {userInfo && (
           <TableContainer overflowY="auto" maxHeight="300px">
             <Table>
               <Thead position="sticky" top={0}>
@@ -63,21 +58,23 @@ const Account = () => {
                   <Th borderRadius="1rem 0 0 1rem" bgColor={LIGHT_GRAY}>
                     Name
                   </Th>
-                  <Th bgColor={LIGHT_GRAY}>Client Name</Th>
-                  <Th bgColor={LIGHT_GRAY}>Head of operation</Th>
+                  <Th bgColor={LIGHT_GRAY}>Email</Th>
+                  <Th bgColor={LIGHT_GRAY}>English Level</Th>
+                  <Th bgColor={LIGHT_GRAY}>Cv Link</Th>
                   <Th borderRadius="0 1rem 1rem 0" bgColor={LIGHT_GRAY}>
-                    Team
+                    View more
                   </Th>
                 </Tr>
               </Thead>
               <Tbody maxH="100px" overflowY="scroll">
-                {accountsInfo.map((account: IAccount) => (
-                  <Tr key={account.id}>
-                    <Td>{account.accountName}</Td>
-                    <Td>{account.clientName}</Td>
-                    <Td>{account.headOfOperation}</Td>
+                {userInfo.map((user: IUser) => (
+                  <Tr key={user.id}>
+                    <Td>{user.name}</Td>
+                    <Td>{user.email}</Td>
+                    <Td>{user.englishLevel}</Td>
+                    <Td>{user.cvLink}</Td>
                     <Td>
-                      <Link to={`${account.id}`}>Ver más</Link>
+                      <Link to={`${user.id}`}>Ver más</Link>
                     </Td>
                   </Tr>
                 ))}
@@ -90,4 +87,4 @@ const Account = () => {
   )
 }
 
-export default Account
+export default User

@@ -19,8 +19,8 @@ const Dashboard = () => {
 
   const { userData } = authData
   useEffect(() => {
-    const fetchData = { id: userData.id, token: authData.token }
-    if (!userInfo) {
+    if (!userInfo && userData) {
+      const fetchData = { id: userData.id, token: authData.token }
       userService
         .fetchUser({ userData: fetchData, remember: true })
         .then((data: IUser) => {
@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <Center h="100%" >
+      <Center h="100%">
         {userInfo && (
           <Stack
             width="80%"

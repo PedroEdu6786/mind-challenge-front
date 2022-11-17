@@ -4,9 +4,9 @@ import useProtectedRoute from './useProtectedRoute'
 import useUserAuth from './useUserAuth'
 
 const useAdminRoute = () => {
-  useProtectedRoute()
   const navigate = useNavigate()
   const [userToken] = useUserAuth()
+  useProtectedRoute()
   useEffect(() => {
     if (!userToken.isAdmin) {
       navigate('/dashboard')
