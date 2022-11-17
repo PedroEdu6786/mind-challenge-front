@@ -10,6 +10,7 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from '@chakra-ui/react'
 
 import DashboardLayout from 'components/templates/DashboardLayout'
@@ -17,6 +18,8 @@ import useAdminRoute from 'hooks/useAdminRoute'
 import { LIGHT_GRAY } from 'constants/colors'
 import useUserAuth from 'hooks/useUserAuth'
 import { accountService } from 'services/account/accountService'
+import AccountRegister from 'components/organisms/AccountRegister'
+import { Link } from 'components/atoms/Link'
 
 interface IAccount {
   id: number
@@ -25,66 +28,10 @@ interface IAccount {
   headOfOperation: string
 }
 
-const accounts: IAccount[] = [
-  {
-    id: 1,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 2,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 3,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 4,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 5,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 6,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 7,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 8,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-  {
-    id: 9,
-    accountName: 'Kueski',
-    clientName: 'Johnathan Smith',
-    headOfOperation: 'John Doe',
-  },
-]
-
 const Account = () => {
   const [authData] = useUserAuth()
   const [accountsInfo, setUserInfo] = useState<IAccount[]>(null)
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   useAdminRoute()
 
@@ -95,16 +42,18 @@ const Account = () => {
         .fetchAccounts({ userData: fetchData, remember: true })
         .then((data: IAccount[]) => {
           setUserInfo(data)
-          console.log(data)
         })
     }
   }, [authData, accountsInfo])
 
   return (
     <DashboardLayout>
+      <AccountRegister isOpen={isOpen} onClose={onClose} />
       <Stack h="100%" spacing="2rem">
         <Heading>Accounts</Heading>
-        <Button maxW="150px" colorScheme="twitter">Add Account</Button>
+        <Button maxW="150px" colorScheme="twitter" onClick={onOpen}>
+          Add Account
+        </Button>
         {accountsInfo && (
           <TableContainer overflowY="auto" maxHeight="300px">
             <Table>
@@ -126,7 +75,9 @@ const Account = () => {
                     <Td>{account.accountName}</Td>
                     <Td>{account.clientName}</Td>
                     <Td>{account.headOfOperation}</Td>
-                    <Td>Ver más</Td>
+                    <Td>
+                      <Link to={`${account.id}`}>Ver más</Link>
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
