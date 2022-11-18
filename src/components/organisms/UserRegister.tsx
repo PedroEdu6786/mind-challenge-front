@@ -50,7 +50,6 @@ const UserRegister = ({
   const onSubmit = async (newUser: IUser) => {
     try {
       const userData = { ...newUser, token: authData.token }
-      console.log(isUpdate)
       if (!isUpdate) {
         await createUser(userData)
       } else {

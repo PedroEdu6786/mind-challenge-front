@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
   Box,
   Button,
@@ -13,32 +13,67 @@ import {
   ModalOverlay,
   Stack,
 } from '@chakra-ui/react'
-import { IAccount } from 'dtos/account'
+import { IAccount, IAccountFetch } from 'dtos/account'
 import useToast from 'hooks/useToast'
 import useUserAuth from 'hooks/useUserAuth'
 import { useForm } from 'react-hook-form'
 import { accountService } from 'services/account/accountService'
 
-const AccountRegister = ({ isOpen, onClose }) => {
+interface IAccountRegister {
+  isOpen: any
+  onClose: any
+  account: IAccount
+  isUpdate?: boolean
+}
+
+const AccountRegister = ({
+  isOpen,
+  onClose,
+  account,
+  isUpdate,
+}: IAccountRegister) => {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
 
   const [authData] = useUserAuth()
-  const { register, handleSubmit } = useForm<IAccount>()
+  const { register, reset, handleSubmit } = useForm<IAccount>({
+    defaultValues: useMemo(() => account, [account]),
+  })
   const { callFailToast, callSuccessToast } = useToast()
+
+  useEffect(() => {
+    reset(account)
+  }, [account, reset])
 
   const onSubmit = async (newAccount: IAccount) => {
     try {
       const accountData = { ...newAccount, token: authData.token }
-      await accountService.createAccount({
-        accountData,
-        remember: true,
-      })
-      callSuccessToast('Account has been successfully created')
+      if (!isUpdate) {
+        await handleCreateAccount(accountData)
+      } else {
+        await handleUpdateAccount(accountData)
+      }
+
       onClose()
     } catch (err) {
       callFailToast('The was an error during the request')
     }
+  }
+
+  const handleCreateAccount = async (accountData: IAccountFetch) => {
+    await accountService.createAccount({
+      accountData,
+      remember: true,
+    })
+    callSuccessToast('Account has been successfully created')
+  }
+
+  const handleUpdateAccount = async (accountData: IAccountFetch) => {
+    await accountService.updateAccount({
+      accountData,
+      remember: true,
+    })
+    callSuccessToast('Account has been successfully updated')
   }
 
   const onError = (err: any) => {
