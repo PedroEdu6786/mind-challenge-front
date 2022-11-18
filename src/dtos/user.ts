@@ -8,7 +8,7 @@ export interface IUserFetch {
   token: string
 }
 
-enum EnglishLevel {
+export enum EnglishLevel {
   beginner = 'beginner',
   intermediate = 'intermediate',
   advanced = 'advanced',
