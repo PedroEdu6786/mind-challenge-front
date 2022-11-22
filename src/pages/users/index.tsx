@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import {
   Button,
   Heading,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
   Table,
   TableContainer,
@@ -21,6 +25,7 @@ import { Link } from 'components/atoms/Link'
 import UserRegister from 'components/organisms/UserRegister'
 import { userService } from 'services/user'
 import { EnglishLevel, IUser } from 'dtos/user'
+import useToast from 'hooks/useToast'
 
 const initValue: IUser = {
   name: '',
@@ -36,6 +41,7 @@ const User = () => {
   const [userInfo, setUserInfo] = useState<IUser[]>(null)
   const [selectedUser, setSelectedUser] = useState<IUser>(initValue)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { callFailToast, callSuccessToast } = useToast()
 
   useAdminRoute()
 
@@ -56,6 +62,20 @@ const User = () => {
     setSelectedUser(user)
     setIsUpdate(isUpdate)
     onOpen()
+  }
+
+  const handleDelete = async (user: IUser) => {
+    try {
+      const fetchData = { token: authData.token, id: user.id }
+
+      await userService.deleteUser({
+        userData: fetchData,
+        remember: true,
+      })
+      callSuccessToast('Account deleted')
+    } catch (err) {
+      callFailToast('The was an error during the request')
+    }
   }
 
   const handleClose = () => {
@@ -109,12 +129,28 @@ const User = () => {
                       <Link to={`${user.id}`}>Ver más</Link>
                     </Td>
                     <Td>
-                      <Button
-                        zIndex={0}
-                        onClick={() => handleUpdate(user, true)}
-                      >
-                        Update
-                      </Button>
+                      <Menu>
+                        <MenuButton
+                          px={4}
+                          py={2}
+                          transition="all 0.2s"
+                          borderRadius="md"
+                          borderWidth="1px"
+                          _hover={{ bg: 'gray.400' }}
+                          _expanded={{ bg: 'blue.400' }}
+                          _focus={{ boxShadow: 'outline' }}
+                        >
+                          Actions
+                        </MenuButton>
+                        <MenuList>
+                          <MenuItem onClick={() => handleUpdate(user, true)}>
+                            Update
+                          </MenuItem>
+                          <MenuItem onClick={() => handleDelete(user)}>
+                            Delete
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
                     </Td>
                   </Tr>
                 ))}

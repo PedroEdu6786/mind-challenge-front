@@ -6,6 +6,7 @@ export const userService = Object.freeze({
   fetchAllUsers: (users: IUserFetchAxios) => fetchAllUsers(users),
   createUser: (userData: IUserCreateAxios) => createUser(userData),
   updateUser: (userData: IUserCreateAxios) => updateUser(userData),
+  deleteUser: (userData: IUserFetchAxios) => deleteUser(userData),
 })
 
 const createUser = async ({ userData, config }: IUserCreateAxios) => {
@@ -60,6 +61,19 @@ const updateUser = async ({ userData, config }: IUserCreateAxios) => {
 const fetchUser = async ({ userData, config }: IUserFetchAxios) => {
   try {
     const res = await axios.get(`/users/${userData.id}`, {
+      headers: { Authorization: `Bearer ${userData.token}` },
+    })
+    const { data } = await res
+
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const deleteUser = async ({ userData, config }: IUserFetchAxios) => {
+  try {
+    const res = await axios.delete(`/users/${userData.id}`, {
       headers: { Authorization: `Bearer ${userData.token}` },
     })
     const { data } = await res
