@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import {
   Button,
   Heading,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
   Table,
   TableContainer,
@@ -20,6 +24,7 @@ import useUserAuth from 'hooks/useUserAuth'
 import { accountService } from 'services/account/accountService'
 import AccountRegister from 'components/organisms/AccountRegister'
 import { Link } from 'components/atoms/Link'
+import useToast from 'hooks/useToast'
 
 interface IAccount {
   id?: number
@@ -40,6 +45,7 @@ const Account = () => {
   const [isUpdate, setIsUpdate] = useState(false)
   const [accountsInfo, setAccountsInfo] = useState<IAccount[]>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { callFailToast, callSuccessToast } = useToast()
 
   useAdminRoute()
 
@@ -55,6 +61,19 @@ const Account = () => {
     }
   }, [authData, accountsInfo, userData])
 
+  const handleDelete = async (account: IAccount) => {
+    try {
+      const fetchData = { token: authData.token, id: account.id }
+
+      await accountService.deleteAccount({
+        userData: fetchData,
+        remember: true,
+      })
+      callSuccessToast('Account deleted')
+    } catch (err) {
+      callFailToast('The was an error during the request')
+    }
+  }
   const handleUpdate = (account: IAccount, isUpdate: boolean) => {
     setSelectedAccount(account)
     setIsUpdate(isUpdate)
@@ -102,12 +121,28 @@ const Account = () => {
                       <Link to={`${account.id}/teams`}>Ver más</Link>
                     </Td>
                     <Td>
-                      <Button
-                        zIndex={0}
-                        onClick={() => handleUpdate(account, true)}
-                      >
-                        Update
-                      </Button>
+                      <Menu>
+                        <MenuButton
+                          px={4}
+                          py={2}
+                          transition="all 0.2s"
+                          borderRadius="md"
+                          borderWidth="1px"
+                          _hover={{ bg: 'gray.400' }}
+                          _expanded={{ bg: 'blue.400' }}
+                          _focus={{ boxShadow: 'outline' }}
+                        >
+                          Actions
+                        </MenuButton>
+                        <MenuList>
+                          <MenuItem onClick={() => handleUpdate(account, true)}>
+                            Update
+                          </MenuItem>
+                          <MenuItem onClick={() => handleDelete(account)}>
+                            Delete
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
                     </Td>
                   </Tr>
                 ))}

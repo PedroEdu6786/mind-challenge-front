@@ -8,6 +8,7 @@ export const accountService = Object.freeze({
     createAccount(accountsData),
   updateAccount: (accountsData: IAccountFetchAxios) =>
     updateAccount(accountsData),
+  deleteAccount: (accountsData: IUserFetchAxios) => deleteAccount(accountsData),
 })
 
 const updateAccount = async ({ accountData, config }: IAccountFetchAxios) => {
@@ -47,6 +48,19 @@ const createAccount = async ({ accountData, config }: IAccountFetchAxios) => {
 const fetchAccounts = async ({ userData, config }: IUserFetchAxios) => {
   try {
     const res = await axios.get(`/accounts`, {
+      headers: { Authorization: `Bearer ${userData.token}` },
+    })
+    const { data } = await res
+
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const deleteAccount = async ({ userData, config }: IUserFetchAxios) => {
+  try {
+    const res = await axios.delete(`/accounts/${userData.id}`, {
       headers: { Authorization: `Bearer ${userData.token}` },
     })
     const { data } = await res
