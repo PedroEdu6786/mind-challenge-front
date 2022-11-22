@@ -87,8 +87,9 @@ const User = () => {
               <Thead position="sticky" top={0} zIndex={1}>
                 <Tr bgColor="white">
                   <Th borderRadius="1rem 0 0 1rem" bgColor={LIGHT_GRAY}>
-                    Name
+                    ID
                   </Th>
+                  <Th bgColor={LIGHT_GRAY}>Name</Th>
                   <Th bgColor={LIGHT_GRAY}>Email</Th>
                   <Th bgColor={LIGHT_GRAY}>English Level</Th>
                   <Th bgColor={LIGHT_GRAY}>Cv Link</Th>
@@ -99,6 +100,7 @@ const User = () => {
               <Tbody maxH="100px" overflowY="scroll">
                 {userInfo.map((user: IUser) => (
                   <Tr key={user.id}>
+                    <Td>{user.id}</Td>
                     <Td>{user.name}</Td>
                     <Td>{user.email}</Td>
                     <Td>{user.englishLevel}</Td>

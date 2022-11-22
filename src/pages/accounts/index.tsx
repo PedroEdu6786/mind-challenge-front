@@ -99,7 +99,7 @@ const Account = () => {
                     <Td>{account.clientName}</Td>
                     <Td>{account.headOfOperation}</Td>
                     <Td>
-                      <Link to={`${account.id}`}>Ver más</Link>
+                      <Link to={`${account.id}/teams`}>Ver más</Link>
                     </Td>
                     <Td>
                       <Button
