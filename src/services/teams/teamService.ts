@@ -4,6 +4,7 @@ import { ITeamCreateAxios } from './team.interfaces'
 export const teamService = Object.freeze({
   fetchAllTeams: (team: ITeamCreateAxios) => fetchAllTeams(team),
   createTeam: (team: ITeamCreateAxios) => createTeam(team),
+  fetchTeamMembers: (team: ITeamCreateAxios) => fetchTeamMembers(team),
 })
 
 const createTeam = async ({ teamData, config }: ITeamCreateAxios) => {
@@ -25,6 +26,20 @@ const createTeam = async ({ teamData, config }: ITeamCreateAxios) => {
 const fetchAllTeams = async ({ teamData }: ITeamCreateAxios) => {
   try {
     const res = await axios.get(`/teams?accountId=${teamData.idAccount}`, {
+      headers: { Authorization: `Bearer ${teamData.token}` },
+    })
+    const { data } = await res
+
+    console.log(data)
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const fetchTeamMembers = async ({ teamData }: ITeamCreateAxios) => {
+  try {
+    const res = await axios.get(`/members?teamId=${teamData.idAccount}`, {
       headers: { Authorization: `Bearer ${teamData.token}` },
     })
     const { data } = await res

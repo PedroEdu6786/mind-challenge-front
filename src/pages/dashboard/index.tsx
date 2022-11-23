@@ -32,7 +32,7 @@ const Dashboard = () => {
   const parsedSkills = []
 
   return (
-    <DashboardLayout>
+    <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
       <Center h="100%">
         {userInfo && (
           <Stack

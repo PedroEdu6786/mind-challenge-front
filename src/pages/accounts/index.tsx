@@ -81,7 +81,7 @@ const Account = () => {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
       <AccountRegister
         isOpen={isOpen}
         onClose={onClose}

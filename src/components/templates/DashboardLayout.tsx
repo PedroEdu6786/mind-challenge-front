@@ -1,5 +1,5 @@
-import React from 'react'
-import { Button, HStack, List, Stack } from '@chakra-ui/react'
+import React, { FC } from 'react'
+import { Button, HStack, List, Stack, StackProps } from '@chakra-ui/react'
 import { Logo } from 'components/atoms/Logo'
 import { NavItem } from 'components/atoms/NavItem'
 import { NavText } from 'components/atoms/NavText'
@@ -7,7 +7,7 @@ import { DARK_BLUE, WHITE_FONT } from 'constants/colors'
 import useUserAuth from 'hooks/useUserAuth'
 import { useNavigate } from 'react-router-dom'
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout: FC<StackProps> = ({ children, ...rest }) => {
   const navigate = useNavigate()
 
   const [userData, , logout] = useUserAuth()
@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }) => {
   }
 
   return (
-    <HStack w="100%" minH="100%" h="100vh">
+    <HStack w="100%" minH="100%" h="100vh" spacing={0}>
       <Stack
         w={{ md: '20%' }}
         maxW="250px"
@@ -43,9 +43,6 @@ const DashboardLayout = ({ children }) => {
               <NavItem>
                 <NavText path="/users">Users</NavText>
               </NavItem>
-              <NavItem>
-                <NavText path="/logs">Logs</NavText>
-              </NavItem>
             </>
           )}
         </List>
@@ -53,13 +50,7 @@ const DashboardLayout = ({ children }) => {
           Sign out
         </Button>
       </Stack>
-      <Stack
-        alignSelf="start"
-        w="100%"
-        h="100vh"
-        px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
-        py="3rem"
-      >
+      <Stack alignSelf="start" w="100%" h="100vh" {...rest}>
         {children}
       </Stack>
     </HStack>

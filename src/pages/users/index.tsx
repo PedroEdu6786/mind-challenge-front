@@ -85,7 +85,7 @@ const User = () => {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
       <UserRegister
         isOpen={isOpen}
         onClose={handleClose}
@@ -102,7 +102,7 @@ const User = () => {
           Create User
         </Button>
         {userInfo && (
-          <TableContainer overflowY="auto" maxHeight="300px">
+          <TableContainer overflowY="auto" maxHeight="300px" maxW="80%">
             <Table>
               <Thead position="sticky" top={0} zIndex={1}>
                 <Tr bgColor="white">
