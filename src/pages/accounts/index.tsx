@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Button,
   Heading,
@@ -25,6 +25,7 @@ import { accountService } from 'services/account/accountService'
 import AccountRegister from 'components/organisms/AccountRegister'
 import { Link } from 'components/atoms/Link'
 import useToast from 'hooks/useToast'
+import { AccountContext, Actions } from 'context/accounts/AccountContext'
 
 interface IAccount {
   id?: number
@@ -39,27 +40,30 @@ const initValue: IAccount = {
   headOfOperation: '',
 }
 
+const handleFetchAccounts = ({ accounts, authData, dispatch }) => {
+  if (accounts) return
+  const fetchData = { token: authData.token }
+  accountService
+    .fetchAccounts({ userData: fetchData, remember: true })
+    .then((data: IAccount[]) => {
+      dispatch({ type: Actions.SET, payload: data })
+    })
+}
+
 const Account = () => {
   const [authData] = useUserAuth()
   const [selectedAccount, setSelectedAccount] = useState<IAccount>(initValue)
   const [isUpdate, setIsUpdate] = useState(false)
-  const [accountsInfo, setAccountsInfo] = useState<IAccount[]>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { callFailToast, callSuccessToast } = useToast()
+  const { state, dispatch } = useContext(AccountContext)
 
   useAdminRoute()
 
-  const { userData } = authData
+  const { accounts } = state
   useEffect(() => {
-    if (!accountsInfo && userData) {
-      const fetchData = { token: authData.token }
-      accountService
-        .fetchAccounts({ userData: fetchData, remember: true })
-        .then((data: IAccount[]) => {
-          setAccountsInfo(data)
-        })
-    }
-  }, [authData, accountsInfo, userData])
+    handleFetchAccounts({ accounts, authData, dispatch })
+  }, [accounts, dispatch, authData])
 
   const handleDelete = async (account: IAccount) => {
     try {
@@ -69,6 +73,7 @@ const Account = () => {
         userData: fetchData,
         remember: true,
       })
+      dispatch({ type: Actions.DELETE, payload: account })
       callSuccessToast('Account deleted')
     } catch (err) {
       callFailToast('The was an error during the request')
@@ -97,7 +102,7 @@ const Account = () => {
         >
           Add Account
         </Button>
-        {accountsInfo && (
+        {accounts && (
           <TableContainer overflowY="auto" maxHeight="300px">
             <Table>
               <Thead position="sticky" top={1}>
@@ -112,7 +117,7 @@ const Account = () => {
                 </Tr>
               </Thead>
               <Tbody maxH="100px" overflowY="scroll">
-                {accountsInfo.map((account: IAccount) => (
+                {accounts.map((account: IAccount) => (
                   <Tr key={account.id}>
                     <Td>{account.accountName}</Td>
                     <Td>{account.clientName}</Td>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Button,
   Heading,
@@ -26,6 +26,7 @@ import UserRegister from 'components/organisms/UserRegister'
 import { userService } from 'services/user'
 import { EnglishLevel, IUser } from 'dtos/user'
 import useToast from 'hooks/useToast'
+import { UserAction, UserContext } from 'context/users/UserContext'
 
 const initValue: IUser = {
   name: '',
@@ -35,28 +36,30 @@ const initValue: IUser = {
   englishLevel: EnglishLevel.beginner,
   isAdmin: false,
 }
+
+const handleFetchUsers = ({ users, authData, dispatch }) => {
+  if (users) return
+  const userData = { token: authData.token }
+  userService.fetchAllUsers({ userData, remember: true }).then((users) => {
+    dispatch({ type: UserAction.SET_USERS, payload: users })
+  })
+}
+
 const User = () => {
   const [authData] = useUserAuth()
   const [isUpdate, setIsUpdate] = useState(false)
-  const [userInfo, setUserInfo] = useState<IUser[]>(null)
   const [selectedUser, setSelectedUser] = useState<IUser>(initValue)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { callFailToast, callSuccessToast } = useToast()
+  const { state, dispatch } = useContext(UserContext)
 
   useAdminRoute()
 
-  const { userData: auth } = authData
+  const { users } = state
 
   useEffect(() => {
-    if (!userInfo && auth) {
-      const userData = { token: authData.token }
-      userService
-        .fetchAllUsers({ userData, remember: true })
-        .then((data: IUser[]) => {
-          setUserInfo(data)
-        })
-    }
-  }, [authData, userInfo, auth])
+    handleFetchUsers({ users, authData, dispatch })
+  }, [users, authData, dispatch])
 
   const handleUpdate = (user: IUser, isUpdate: boolean) => {
     setSelectedUser(user)
@@ -72,6 +75,8 @@ const User = () => {
         userData: fetchData,
         remember: true,
       })
+
+      dispatch({ type: UserAction.DELETE_USER, payload: user })
       callSuccessToast('Account deleted')
     } catch (err) {
       callFailToast('The was an error during the request')
@@ -85,7 +90,11 @@ const User = () => {
   }
 
   return (
-    <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
+    <DashboardLayout
+      px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
+      py="3rem"
+      maxW="80%"
+    >
       <UserRegister
         isOpen={isOpen}
         onClose={handleClose}
@@ -101,8 +110,8 @@ const User = () => {
         >
           Create User
         </Button>
-        {userInfo && (
-          <TableContainer overflowY="auto" maxHeight="300px" maxW="80%">
+        {users && (
+          <TableContainer overflowY="auto" maxHeight="300px" fontSize=".9rem">
             <Table>
               <Thead position="sticky" top={0} zIndex={1}>
                 <Tr bgColor="white">
@@ -118,7 +127,7 @@ const User = () => {
                 </Tr>
               </Thead>
               <Tbody maxH="100px" overflowY="scroll">
-                {userInfo.map((user: IUser) => (
+                {users.map((user: IUser) => (
                   <Tr key={user.id}>
                     <Td>{user.id}</Td>
                     <Td>{user.name}</Td>

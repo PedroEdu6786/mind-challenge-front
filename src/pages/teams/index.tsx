@@ -14,6 +14,7 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from '@chakra-ui/react'
 
 import DashboardLayout from 'components/templates/DashboardLayout'
@@ -25,14 +26,16 @@ import useToast from 'hooks/useToast'
 import { LIGHT_GRAY } from 'constants/colors'
 import { IUser } from 'dtos/user'
 import { Link } from 'components/atoms/Link'
+import MemberRegister from 'components/organisms/MemberRegister'
 
-interface ITeam {
+export interface ITeam {
   id?: number
   idAccount: number
 }
 
 const Teams = () => {
   const [authData] = useUserAuth()
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [teamsInfo, setTeamsInfo] = useState<ITeam[]>(null)
   const { id: teamId } = useParams()
@@ -48,6 +51,7 @@ const Teams = () => {
         .fetchAllTeams({ teamData: fetchData, remember: true })
         .then((data: ITeam[]) => {
           setTeamsInfo(data)
+          if (data.length > 0) handleFetchTeam(data[0].id)
         })
     }
   }, [authData, teamsInfo, userData, teamId])
@@ -81,6 +85,7 @@ const Teams = () => {
 
   return (
     <DashboardLayout>
+      {/* <MemberRegister isOpen={isOpen} onClose={onClose} team={selectedTeam} /> */}
       <HStack w="100%" minH="100%" h="100vh">
         <Stack
           w={{ md: '20%' }}
@@ -105,19 +110,17 @@ const Teams = () => {
             </ListItem>
             <Divider />
             {teamsInfo &&
-              teamsInfo.map((team) => {
-                return (
-                  <ListItem key={team.id}>
-                    <Button
-                      w="100%"
-                      variant="ghost"
-                      onClick={() => handleFetchTeam(team.id)}
-                    >
-                      {team.id}
-                    </Button>
-                  </ListItem>
-                )
-              })}
+              teamsInfo.map((team) => (
+                <ListItem key={team.id}>
+                  <Button
+                    w="100%"
+                    variant="ghost"
+                    onClick={() => handleFetchTeam(team.id)}
+                  >
+                    {team.id}
+                  </Button>
+                </ListItem>
+              ))}
           </List>
         </Stack>
         <Stack
@@ -128,7 +131,10 @@ const Teams = () => {
           px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
           py="3rem"
         >
-          <Heading>Team Members</Heading>
+          <HStack justify="space-between">
+            <Heading>Team Members</Heading>
+            <Button onClick={onOpen}>Add Member</Button>
+          </HStack>
           <TableContainer overflowY="auto" maxHeight="300px">
             <Table>
               <Thead position="sticky" top={1}>

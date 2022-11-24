@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import useToast from 'hooks/useToast'
 import useUserAuth from 'hooks/useUserAuth'
 import { useForm } from 'react-hook-form'
 import { accountService } from 'services/account/accountService'
+import { AccountContext, Actions } from 'context/accounts/AccountContext'
 
 interface IAccountRegister {
   isOpen: any
@@ -32,13 +33,12 @@ const AccountRegister = ({
   account,
   isUpdate,
 }: IAccountRegister) => {
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
-
   const [authData] = useUserAuth()
   const { register, reset, handleSubmit } = useForm<IAccount>({
     defaultValues: useMemo(() => account, [account]),
   })
+  const { dispatch } = useContext(AccountContext)
+
   const { callFailToast, callSuccessToast } = useToast()
 
   useEffect(() => {
@@ -65,6 +65,7 @@ const AccountRegister = ({
       accountData,
       remember: true,
     })
+    dispatch({ type: Actions.CREATE, payload: accountData })
     callSuccessToast('Account has been successfully created')
   }
 
@@ -73,6 +74,7 @@ const AccountRegister = ({
       accountData,
       remember: true,
     })
+    dispatch({ type: Actions.UPDATE, payload: accountData })
     callSuccessToast('Account has been successfully updated')
   }
 
@@ -82,59 +84,51 @@ const AccountRegister = ({
   }
 
   return (
-    <>
-      <Modal
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <ModalOverlay />
-        <ModalContent as="form" onSubmit={handleSubmit(onSubmit, onError)}>
-          <ModalHeader>Add a new account</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <Stack>
-              <Box>
-                <FormLabel>Account Name</FormLabel>
-                <Input
-                  ref={initialRef}
-                  type="text"
-                  name="accountName"
-                  placeholder="My Account Name"
-                  {...register('accountName', { required: true })}
-                />
-              </Box>
-              <Box>
-                <FormLabel>Client's Name</FormLabel>
-                <Input
-                  type="text"
-                  name="clientName"
-                  placeholder="John Doe"
-                  {...register('clientName', { required: true })}
-                />
-              </Box>
-              <Box>
-                <FormLabel>Head of Operation</FormLabel>
-                <Input
-                  type="text"
-                  name="headOfOperation"
-                  placeholder="John Smith"
-                  {...register('headOfOperation', { required: true })}
-                />
-              </Box>
-            </Stack>
-          </ModalBody>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent as="form" onSubmit={handleSubmit(onSubmit, onError)}>
+        <ModalHeader>Add a new account</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <Stack>
+            <Box>
+              <FormLabel>Account Name</FormLabel>
+              <Input
+                type="text"
+                name="accountName"
+                placeholder="My Account Name"
+                {...register('accountName', { required: true })}
+              />
+            </Box>
+            <Box>
+              <FormLabel>Client's Name</FormLabel>
+              <Input
+                type="text"
+                name="clientName"
+                placeholder="John Doe"
+                {...register('clientName', { required: true })}
+              />
+            </Box>
+            <Box>
+              <FormLabel>Head of Operation</FormLabel>
+              <Input
+                type="text"
+                name="headOfOperation"
+                placeholder="John Smith"
+                {...register('headOfOperation', { required: true })}
+              />
+            </Box>
+          </Stack>
+        </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} type="submit">
-              Save account
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} type="submit">
+            Save account
+          </Button>
+          <Button onClick={onClose}>Cancel</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   )
 }
 

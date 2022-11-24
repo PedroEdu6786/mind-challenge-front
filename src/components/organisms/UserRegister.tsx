@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import {
   Box,
   Button,
@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form'
 import { IUser } from 'dtos/user'
 import { userService } from 'services/user'
 import { IUserCreate } from 'dtos/user'
+import { UserAction, UserContext } from 'context/users/UserContext'
 
 interface IUserRegister {
   isOpen: any
@@ -35,14 +36,13 @@ const UserRegister = ({
   user,
   isUpdate = false,
 }: IUserRegister) => {
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
+  const { dispatch } = useContext(UserContext)
+  const { callFailToast, callSuccessToast } = useToast()
 
   const [authData] = useUserAuth()
   const { register, reset, handleSubmit } = useForm<IUser>({
     defaultValues: useMemo(() => user, [user]),
   })
-  const { callFailToast, callSuccessToast } = useToast()
   useEffect(() => {
     reset(user)
   }, [user, reset])
@@ -66,14 +66,16 @@ const UserRegister = ({
       userData,
       remember: true,
     })
+    dispatch({ type: UserAction.UPDATE_USER, payload: userData })
     callSuccessToast('User has been successfully updated')
   }
 
   const createUser = async (userData: IUserCreate) => {
-    await userService.createUser({
+    const newUser = await userService.createUser({
       userData,
       remember: true,
     })
+    dispatch({ type: UserAction.ADD_USER, payload: newUser })
     callSuccessToast('User has been successfully created')
   }
 
@@ -82,15 +84,8 @@ const UserRegister = ({
     callFailToast(`Invalid fields: ${keys}`)
   }
 
-  console.log(isUpdate)
-
   return (
-    <Modal
-      initialFocusRef={initialRef}
-      finalFocusRef={finalRef}
-      isOpen={isOpen}
-      onClose={onClose}
-    >
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent as="form" onSubmit={handleSubmit(onSubmit, onError)}>
         <ModalHeader>Add a new account</ModalHeader>
@@ -100,7 +95,6 @@ const UserRegister = ({
             <Box>
               <FormLabel>Username</FormLabel>
               <Input
-                ref={initialRef}
                 type="text"
                 name="name"
                 placeholder="User's name"
