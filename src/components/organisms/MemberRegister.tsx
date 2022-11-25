@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useContext, useEffect } from 'react'
 import {
   Box,
   Button,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -14,46 +13,48 @@ import {
   Select,
   Stack,
 } from '@chakra-ui/react'
-import { IAccount, IAccountFetch } from 'dtos/account'
 import useToast from 'hooks/useToast'
 import useUserAuth from 'hooks/useUserAuth'
 import { useForm } from 'react-hook-form'
-import { accountService } from 'services/account/accountService'
-// import { handleUserEffect } from 'pages/users'
-import { teamService } from 'services/teams/teamService'
 import { memberService } from 'services/member/memberService'
-import { useParams } from 'react-router-dom'
-import { ITeam } from 'pages/teams'
+import { useSearchParams } from 'react-router-dom'
+import { UserContext } from 'context/users/UserContext'
+import { handleFetchUsers } from 'pages/users'
 
 interface IAccountRegister {
   isOpen: any
   onClose: any
-  team: ITeam
+  addMember: any
 }
 
-const MemberRegister = ({ isOpen, onClose, team }: IAccountRegister) => {
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
-
+const MemberRegister = ({ isOpen, onClose, addMember }: IAccountRegister) => {
   const [authData] = useUserAuth()
   const { register, handleSubmit } = useForm()
   const { callFailToast, callSuccessToast } = useToast()
+  const { state, dispatch } = useContext(UserContext)
+  const [searchParams] = useSearchParams()
 
-  // useEffect(
-  //   () => handleUserEffect({ users: data, fetchUsers }),
-  //   [data, fetchUsers]
-  // )
+  const { users } = state
+  useEffect(() => {
+    handleFetchUsers({ users, authData, dispatch })
+  }, [users, authData, dispatch])
 
-  const handleCreateAccount = async (data) => {
-    console.log(data)
-    console.log(team)
-    // const memberData = {
-    //   idUser: data.idUser,
-    //   idTeam: team.id,
-    //   token: authData.token,
-    // }
-    // await memberService.addTeamMember({ memberData, remember: true })
-    callSuccessToast('Member has been added successfully')
+  const handleAddMember = async (data) => {
+    try {
+      const memberData = {
+        idUser: data.idUser,
+        idTeam: Number(searchParams.get('teamId')),
+        token: authData.token,
+      }
+      await memberService.addTeamMember({ memberData, remember: true })
+      const newMember = users.filter((user) => user.id === Number(data.idUser))
+      addMember((prevMembers) => {
+        return [...prevMembers, ...newMember]
+      })
+      callSuccessToast('Member has been added successfully')
+    } catch (err) {
+      callFailToast('User has already been added to a team')
+    }
   }
 
   const onError = (err: any) => {
@@ -62,48 +63,38 @@ const MemberRegister = ({ isOpen, onClose, team }: IAccountRegister) => {
   }
 
   return (
-    <>
-      <Modal
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <ModalOverlay />
-        <ModalContent
-          as="form"
-          onSubmit={handleSubmit(handleCreateAccount, onError)}
-        >
-          <ModalHeader>Add a new account</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <Stack>
-              <Box>
-                <FormLabel>Account Name</FormLabel>
-                <Select
-                  placeholder="Select option"
-                  {...register('idUser', { required: true })}
-                >
-                  {/* {data &&
-                    data.map((data) => (
-                      <Box as="option" value={data.id} key={data.id}>
-                        {data.name}
-                      </Box>
-                    ))} */}
-                </Select>
-              </Box>
-            </Stack>
-          </ModalBody>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent as="form" onSubmit={handleSubmit(handleAddMember, onError)}>
+        <ModalHeader>Add a new account</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <Stack>
+            <Box>
+              <FormLabel>Account Name</FormLabel>
+              <Select
+                placeholder="Select option"
+                {...register('idUser', { required: true })}
+              >
+                {users &&
+                  users.map((data) => (
+                    <Box as="option" value={data.id} key={data.id}>
+                      {data.name}
+                    </Box>
+                  ))}
+              </Select>
+            </Box>
+          </Stack>
+        </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} type="submit">
-              Save account
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} type="submit">
+            Save account
+          </Button>
+          <Button onClick={onClose}>Cancel</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   )
 }
 

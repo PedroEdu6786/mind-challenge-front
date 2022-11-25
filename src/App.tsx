@@ -6,19 +6,22 @@ import User from 'pages/users'
 import Teams from 'pages/teams'
 import { UserProvider } from 'context/users/UserProvider'
 import { AccountProvider } from 'context/accounts/AccountProvider'
+import { TeamProvider } from 'context/teams/TeamProvider'
 
 function App() {
   return (
     <BrowserRouter>
       <UserProvider>
         <AccountProvider>
-          <Routes>
-            <Route path="auth/login" element={<Login />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="accounts" element={<Account />} />
-            <Route path="/accounts/:id/teams" element={<Teams />} />
-            <Route path="users" element={<User />} />
-          </Routes>
+          <TeamProvider>
+            <Routes>
+              <Route path="auth/login" element={<Login />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="accounts" element={<Account />} />
+              <Route path="/accounts/:id/teams" element={<Teams />} />
+              <Route path="users" element={<User />} />
+            </Routes>
+          </TeamProvider>
         </AccountProvider>
       </UserProvider>
     </BrowserRouter>

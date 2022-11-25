@@ -61,11 +61,11 @@ const AccountRegister = ({
   }
 
   const handleCreateAccount = async (accountData: IAccountFetch) => {
-    await accountService.createAccount({
+    const data = await accountService.createAccount({
       accountData,
       remember: true,
     })
-    dispatch({ type: Actions.CREATE, payload: accountData })
+    dispatch({ type: Actions.CREATE, payload: data })
     callSuccessToast('Account has been successfully created')
   }
 

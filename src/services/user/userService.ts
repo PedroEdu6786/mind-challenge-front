@@ -91,7 +91,6 @@ const fetchAllUsers = async ({ userData }: IUserFetchAxios) => {
     })
     const { data } = await res
 
-    console.log(data)
     return data
   } catch (err) {
     throw new Error()

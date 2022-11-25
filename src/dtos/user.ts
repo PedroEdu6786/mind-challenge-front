@@ -24,6 +24,7 @@ export interface IUser {
   isAdmin: boolean
   isSuperadmin?: boolean
   team?: string
+  teamId?: number
 }
 
 export interface IUserCreate extends IUser {

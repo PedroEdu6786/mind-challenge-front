@@ -50,7 +50,7 @@ const DashboardLayout: FC<StackProps> = ({ children, ...rest }) => {
           Sign out
         </Button>
       </Stack>
-      <Stack alignSelf="start" w="100%" h="100vh" {...rest}>
+      <Stack alignSelf="start" w="100%" h="100vh" {...rest} maxW="83%">
         {children}
       </Stack>
     </HStack>

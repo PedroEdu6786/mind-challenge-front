@@ -21,12 +21,13 @@ import DashboardLayout from 'components/templates/DashboardLayout'
 import useAdminRoute from 'hooks/useAdminRoute'
 import useUserAuth from 'hooks/useUserAuth'
 import { teamService } from 'services/teams/teamService'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import useToast from 'hooks/useToast'
 import { LIGHT_GRAY } from 'constants/colors'
 import { IUser } from 'dtos/user'
 import { Link } from 'components/atoms/Link'
 import MemberRegister from 'components/organisms/MemberRegister'
+import { memberService } from 'services/member/memberService'
 
 export interface ITeam {
   id?: number
@@ -36,32 +37,43 @@ export interface ITeam {
 const Teams = () => {
   const [authData] = useUserAuth()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [selectedTeam, setSelectedTeam] = useState(null)
+  const [selectedTeam, setSelectedTeam] = useState<IUser[]>(null)
   const [teamsInfo, setTeamsInfo] = useState<ITeam[]>(null)
-  const { id: teamId } = useParams()
+  const { id: accountId } = useParams()
   const { callFailToast, callSuccessToast } = useToast()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  // const { state, dispatch } = useContext(AccountContext)
 
   useAdminRoute()
 
   const { userData } = authData
+
+  const teamId = searchParams.get('teamId')
+
   useEffect(() => {
     if (!teamsInfo && userData) {
-      const fetchData = { token: authData.token, idAccount: Number(teamId) }
+      const fetchData = {
+        token: authData.token,
+        idAccount: Number(accountId),
+      }
       teamService
         .fetchAllTeams({ teamData: fetchData, remember: true })
         .then((data: ITeam[]) => {
           setTeamsInfo(data)
-          if (data.length > 0) handleFetchTeam(data[0].id)
+          if (data.length > 0 && !teamId) handleFetchTeam(data[0].id)
+          if (teamId) handleFetchTeam(teamId)
         })
     }
-  }, [authData, teamsInfo, userData, teamId])
+  }, [accountId, authData, teamsInfo, userData])
 
   const handleCreateTeam = async () => {
     try {
-      await teamService.createTeam({
-        teamData: { idAccount: Number(teamId), token: authData.token },
+      const data = await teamService.createTeam({
+        teamData: { idAccount: Number(accountId), token: authData.token },
         remember: true,
       })
+      setTeamsInfo([...teamsInfo, data])
       callSuccessToast('Team has been created successfully')
     } catch (error) {
       console.log(error)
@@ -70,22 +82,58 @@ const Teams = () => {
   }
 
   const handleFetchTeam = async (teamId) => {
+    navigate(`?teamId=${teamId}`)
     try {
-      const data = await teamService.fetchTeamMembers({
-        teamData: { idAccount: Number(teamId), token: authData.token },
+      teamService
+        .fetchTeamMembers({
+          teamData: { idAccount: Number(teamId), token: authData.token },
+          remember: true,
+        })
+        .then((data) => setSelectedTeam(data))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDeleteMember = async (userId: number) => {
+    try {
+      await memberService.deleteTeamMember({
+        memberData: { idUser: userId, token: authData.token },
         remember: true,
       })
-      setSelectedTeam(data)
-      console.log(data)
+      const newTeam = selectedTeam.filter((data) => data.id !== userId)
+      setSelectedTeam([...newTeam])
+      callSuccessToast('Team has been created successfully')
     } catch (error) {
       console.log(error)
       callFailToast('Team could not be created')
     }
   }
 
+  const handleDeleteTeam = async () => {
+    try {
+      await teamService.deleteTeamMembers({
+        teamData: { id: Number(teamId), token: authData.token },
+        remember: true,
+      })
+
+      const newTeams = teamsInfo.filter((team) => team.id !== Number(teamId))
+
+      navigate('')
+      setSelectedTeam(null)
+      setTeamsInfo(newTeams)
+    } catch (error) {
+      callFailToast('Could not delete team')
+    }
+  }
+
   return (
     <DashboardLayout>
-      {/* <MemberRegister isOpen={isOpen} onClose={onClose} team={selectedTeam} /> */}
+      <MemberRegister
+        isOpen={isOpen}
+        onClose={onClose}
+        addMember={setSelectedTeam}
+      />
       <HStack w="100%" minH="100%" h="100vh">
         <Stack
           w={{ md: '20%' }}
@@ -133,7 +181,12 @@ const Teams = () => {
         >
           <HStack justify="space-between">
             <Heading>Team Members</Heading>
-            <Button onClick={onOpen}>Add Member</Button>
+            <HStack>
+              <Button isDisabled={Boolean(!selectedTeam)} onClick={onOpen}>Add Member</Button>
+              <Button isDisabled={Boolean(!selectedTeam)} onClick={handleDeleteTeam} variant="outline">
+                Delete Team
+              </Button>
+            </HStack>
           </HStack>
           <TableContainer overflowY="auto" maxHeight="300px">
             <Table>
@@ -154,10 +207,14 @@ const Teams = () => {
                     <Tr key={user.id}>
                       <Td>{user.name}</Td>
                       <Td>
-                        <Link to={`users/${user.id}`}>View More</Link>
+                        {/* <Link to={`users/${user.id}`}>View More</Link> */}
                       </Td>
                       <Td>
-                        <Button colorScheme="red" variant="outline">
+                        <Button
+                          colorScheme="red"
+                          variant="outline"
+                          onClick={() => handleDeleteMember(user.id)}
+                        >
                           Remove
                         </Button>
                       </Td>

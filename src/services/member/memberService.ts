@@ -3,6 +3,7 @@ import { IMemberCreateAxios } from './member.interface'
 
 export const memberService = Object.freeze({
   addTeamMember: (team: IMemberCreateAxios) => addTeamMember(team),
+  deleteTeamMember: (team: IMemberCreateAxios) => deleteTeamMember(team),
 })
 
 const addTeamMember = async ({ memberData }: IMemberCreateAxios) => {
@@ -14,7 +15,20 @@ const addTeamMember = async ({ memberData }: IMemberCreateAxios) => {
     })
     const { data } = await res
 
-    console.log(data, 'test')
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const deleteTeamMember = async ({ memberData }: IMemberCreateAxios) => {
+  try {
+    const { idUser } = memberData
+    const payload = { idTeam: null, idUser }
+    const res = await axios.put(`/members`, payload, {
+      headers: { Authorization: `Bearer ${memberData.token}` },
+    })
+    const { data } = await res
 
     return data
   } catch (err) {

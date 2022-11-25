@@ -4,6 +4,7 @@ import { ITeamCreateAxios } from './team.interfaces'
 export const teamService = Object.freeze({
   fetchAllTeams: (team: ITeamCreateAxios) => fetchAllTeams(team),
   createTeam: (team: ITeamCreateAxios) => createTeam(team),
+  deleteTeamMembers: (team: ITeamCreateAxios) => deleteTeamMembers(team),
   fetchTeamMembers: (team: ITeamCreateAxios) => fetchTeamMembers(team),
 })
 
@@ -30,7 +31,6 @@ const fetchAllTeams = async ({ teamData }: ITeamCreateAxios) => {
     })
     const { data } = await res
 
-    console.log(data)
     return data
   } catch (err) {
     throw new Error()
@@ -44,7 +44,19 @@ const fetchTeamMembers = async ({ teamData }: ITeamCreateAxios) => {
     })
     const { data } = await res
 
-    console.log(data)
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const deleteTeamMembers = async ({ teamData }: ITeamCreateAxios) => {
+  try {
+    const res = await axios.delete(`/teams/${teamData.id}`, {
+      headers: { Authorization: `Bearer ${teamData.token}` },
+    })
+    const { data } = await res
+
     return data
   } catch (err) {
     throw new Error()

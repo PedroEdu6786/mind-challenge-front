@@ -1,9 +1,9 @@
-import AxiosConfig from "services/axiosConfig"
+import AxiosConfig from 'services/axiosConfig'
 
 interface ITeamCreate {
   id?: number
   token: string
-  idAccount: number
+  idAccount?: number
 }
 export interface ITeamCreateAxios extends AxiosConfig {
   teamData: ITeamCreate

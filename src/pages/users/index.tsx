@@ -37,7 +37,7 @@ const initValue: IUser = {
   isAdmin: false,
 }
 
-const handleFetchUsers = ({ users, authData, dispatch }) => {
+export const handleFetchUsers = ({ users, authData, dispatch }) => {
   if (users) return
   const userData = { token: authData.token }
   userService.fetchAllUsers({ userData, remember: true }).then((users) => {
@@ -90,11 +90,7 @@ const User = () => {
   }
 
   return (
-    <DashboardLayout
-      px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
-      py="3rem"
-      maxW="80%"
-    >
+    <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
       <UserRegister
         isOpen={isOpen}
         onClose={handleClose}
