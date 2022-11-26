@@ -2,18 +2,10 @@ import React, { useEffect, useState } from 'react'
 import {
   Button,
   Divider,
-  Heading,
   HStack,
   List,
   ListItem,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   useDisclosure,
 } from '@chakra-ui/react'
 
@@ -23,11 +15,13 @@ import useUserAuth from 'hooks/useUserAuth'
 import { teamService } from 'services/teams/teamService'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import useToast from 'hooks/useToast'
-import { LIGHT_GRAY } from 'constants/colors'
 import { IUser } from 'dtos/user'
 import { Link } from 'components/atoms/Link'
 import MemberRegister from 'components/organisms/MemberRegister'
 import { memberService } from 'services/member/memberService'
+import TeamMembers from 'components/organisms/TeamMembers'
+import { logsService } from 'services/logs/logsService'
+import TeamLogs from 'components/organisms/TeamLogs'
 
 export interface ITeam {
   id?: number
@@ -43,7 +37,8 @@ const Teams = () => {
   const { callFailToast, callSuccessToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  // const { state, dispatch } = useContext(AccountContext)
+  const [viewLogs, setViewLogs] = useState(false)
+  const [logs, setLogs] = useState(null)
 
   useAdminRoute()
 
@@ -82,6 +77,8 @@ const Teams = () => {
   }
 
   const handleFetchTeam = async (teamId) => {
+    setViewLogs(false)
+
     navigate(`?teamId=${teamId}`)
     try {
       teamService
@@ -105,7 +102,6 @@ const Teams = () => {
       setSelectedTeam([...newTeam])
       callSuccessToast('Team has been created successfully')
     } catch (error) {
-      console.log(error)
       callFailToast('Team could not be created')
     }
   }
@@ -124,6 +120,20 @@ const Teams = () => {
       setTeamsInfo(newTeams)
     } catch (error) {
       callFailToast('Could not delete team')
+    }
+  }
+
+  const handleLogs = async () => {
+    try {
+      const logs = await logsService.getLogsByAccount({
+        logsData: { idAccount: Number(accountId), token: authData.token },
+        remember: true,
+      })
+
+      setLogs(logs)
+      setViewLogs(true)
+    } catch (error) {
+      callFailToast('Could not get logs')
     }
   }
 
@@ -156,6 +166,12 @@ const Teams = () => {
                 Add Team
               </Button>
             </ListItem>
+            <ListItem>
+              <Button maxW="150px" variant="outline" onClick={handleLogs}>
+                View Logs
+              </Button>
+            </ListItem>
+
             <Divider />
             {teamsInfo &&
               teamsInfo.map((team) => (
@@ -179,50 +195,16 @@ const Teams = () => {
           px={{ base: '.25rem', sm: '.5rem', md: '2rem' }}
           py="3rem"
         >
-          <HStack justify="space-between">
-            <Heading>Team Members</Heading>
-            <HStack>
-              <Button isDisabled={Boolean(!selectedTeam)} onClick={onOpen}>Add Member</Button>
-              <Button isDisabled={Boolean(!selectedTeam)} onClick={handleDeleteTeam} variant="outline">
-                Delete Team
-              </Button>
-            </HStack>
-          </HStack>
-          <TableContainer overflowY="auto" maxHeight="300px">
-            <Table>
-              <Thead position="sticky" top={1}>
-                <Tr bgColor="white">
-                  <Th borderRadius="1rem 0 0 1rem" bgColor={LIGHT_GRAY}>
-                    Name
-                  </Th>
-                  <Th bgColor={LIGHT_GRAY}>Details</Th>
-                  <Th borderRadius="0 1rem 1rem 0" bgColor={LIGHT_GRAY}>
-                    Actions
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody maxH="100px" overflowY="scroll">
-                {selectedTeam &&
-                  selectedTeam.map((user: IUser) => (
-                    <Tr key={user.id}>
-                      <Td>{user.name}</Td>
-                      <Td>
-                        {/* <Link to={`users/${user.id}`}>View More</Link> */}
-                      </Td>
-                      <Td>
-                        <Button
-                          colorScheme="red"
-                          variant="outline"
-                          onClick={() => handleDeleteMember(user.id)}
-                        >
-                          Remove
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          {viewLogs ? (
+            <TeamLogs logs={logs} />
+          ) : (
+            <TeamMembers
+              selectedTeam={selectedTeam}
+              onOpen={onOpen}
+              handleDeleteTeam={handleDeleteTeam}
+              handleDeleteMember={handleDeleteMember}
+            />
+          )}
         </Stack>
       </HStack>
     </DashboardLayout>
