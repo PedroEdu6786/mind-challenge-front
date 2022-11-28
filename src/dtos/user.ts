@@ -8,7 +8,7 @@ export interface IUserFetch {
   token: string
 }
 
-enum EnglishLevel {
+export enum EnglishLevel {
   beginner = 'beginner',
   intermediate = 'intermediate',
   advanced = 'advanced',
@@ -24,6 +24,7 @@ export interface IUser {
   isAdmin: boolean
   isSuperadmin?: boolean
   team?: string
+  teamId?: number
 }
 
 export interface IUserCreate extends IUser {

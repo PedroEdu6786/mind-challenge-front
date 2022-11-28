@@ -5,6 +5,8 @@ export const userService = Object.freeze({
   fetchUser: (authData: IUserFetchAxios) => fetchUser(authData),
   fetchAllUsers: (users: IUserFetchAxios) => fetchAllUsers(users),
   createUser: (userData: IUserCreateAxios) => createUser(userData),
+  updateUser: (userData: IUserCreateAxios) => updateUser(userData),
+  deleteUser: (userData: IUserFetchAxios) => deleteUser(userData),
 })
 
 const createUser = async ({ userData, config }: IUserCreateAxios) => {
@@ -32,9 +34,46 @@ const createUser = async ({ userData, config }: IUserCreateAxios) => {
   }
 }
 
+const updateUser = async ({ userData, config }: IUserCreateAxios) => {
+  try {
+    const { name, email, englishLevel, cvLink, isAdmin, skills } = userData
+    const payload = {
+      name,
+      email,
+      englishLevel,
+      cvLink,
+      isAdmin,
+      skills,
+    }
+
+    const res = await axios.put(`/users/${userData.id}`, payload, {
+      headers: { Authorization: `Bearer ${userData.token}` },
+      ...config,
+    })
+    const { data } = await res
+
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
 const fetchUser = async ({ userData, config }: IUserFetchAxios) => {
   try {
     const res = await axios.get(`/users/${userData.id}`, {
+      headers: { Authorization: `Bearer ${userData.token}` },
+    })
+    const { data } = await res
+
+    return data
+  } catch (err) {
+    throw new Error()
+  }
+}
+
+const deleteUser = async ({ userData, config }: IUserFetchAxios) => {
+  try {
+    const res = await axios.delete(`/users/${userData.id}`, {
       headers: { Authorization: `Bearer ${userData.token}` },
     })
     const { data } = await res
@@ -52,7 +91,6 @@ const fetchAllUsers = async ({ userData }: IUserFetchAxios) => {
     })
     const { data } = await res
 
-    console.log(data)
     return data
   } catch (err) {
     throw new Error()

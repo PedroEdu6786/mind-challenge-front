@@ -43,6 +43,7 @@ const Login = () => {
           <Box>
             <FormLabel>Email</FormLabel>
             <Input
+              data-testid="input-email"
               type="email"
               placeholder="john@mail.com"
               size="md"
@@ -52,13 +53,14 @@ const Login = () => {
           <Box>
             <FormLabel>Password</FormLabel>
             <Input
+              data-testid="input-password"
               type="password"
               placeholder="password"
               size="md"
               {...register('password', { required: true })}
             />
           </Box>
-          <Button colorScheme="red" type="submit">
+          <Button data-testid="submit-form" colorScheme="red" type="submit">
             Login
           </Button>
         </Stack>
