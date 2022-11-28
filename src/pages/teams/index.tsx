@@ -16,7 +16,6 @@ import { teamService } from 'services/teams/teamService'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import useToast from 'hooks/useToast'
 import { IUser } from 'dtos/user'
-import { Link } from 'components/atoms/Link'
 import MemberRegister from 'components/organisms/MemberRegister'
 import { memberService } from 'services/member/memberService'
 import TeamMembers from 'components/organisms/TeamMembers'
@@ -25,7 +24,7 @@ import TeamLogs from 'components/organisms/TeamLogs'
 
 export interface ITeam {
   id?: number
-  idAccount: number
+  accountId: number
 }
 
 const Teams = () => {
@@ -50,7 +49,7 @@ const Teams = () => {
     if (!teamsInfo && userData) {
       const fetchData = {
         token: authData.token,
-        idAccount: Number(accountId),
+        accountId: Number(accountId),
       }
       teamService
         .fetchAllTeams({ teamData: fetchData, remember: true })
@@ -65,7 +64,7 @@ const Teams = () => {
   const handleCreateTeam = async () => {
     try {
       const data = await teamService.createTeam({
-        teamData: { idAccount: Number(accountId), token: authData.token },
+        teamData: { accountId: Number(accountId), token: authData.token },
         remember: true,
       })
       setTeamsInfo([...teamsInfo, data])
@@ -83,7 +82,7 @@ const Teams = () => {
     try {
       teamService
         .fetchTeamMembers({
-          teamData: { idAccount: Number(teamId), token: authData.token },
+          teamData: { accountId: Number(teamId), token: authData.token },
           remember: true,
         })
         .then((data) => setSelectedTeam(data))
@@ -126,7 +125,7 @@ const Teams = () => {
   const handleLogs = async () => {
     try {
       const logs = await logsService.getLogsByAccount({
-        logsData: { idAccount: Number(accountId), token: authData.token },
+        logsData: { accountId: Number(accountId), token: authData.token },
         remember: true,
       })
 
@@ -158,6 +157,7 @@ const Teams = () => {
           <List spacing="1.5rem">
             <ListItem>
               <Button
+                data-testid="create-team"
                 maxW="150px"
                 colorScheme="twitter"
                 variant="outline"
@@ -167,7 +167,12 @@ const Teams = () => {
               </Button>
             </ListItem>
             <ListItem>
-              <Button maxW="150px" variant="outline" onClick={handleLogs}>
+              <Button
+                data-testid="view-logs"
+                maxW="150px"
+                variant="outline"
+                onClick={handleLogs}
+              >
                 View Logs
               </Button>
             </ListItem>

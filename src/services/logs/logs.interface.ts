@@ -2,7 +2,7 @@ import AxiosConfig from 'services/axiosConfig'
 
 interface ILogsCreate {
   id?: number
-  idAccount: number
+  accountId: number
   token: string
 }
 export interface ILogsCreateAxios extends AxiosConfig {

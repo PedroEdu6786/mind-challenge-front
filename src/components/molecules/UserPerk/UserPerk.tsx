@@ -11,7 +11,7 @@ export const UserPerk: FC<IUserPerk> = ({ perkName, perkContent }) => {
       <Text fontSize={{ md: 'xl', lg: '2xl' }} fontWeight="bold">
         {perkName}
       </Text>
-      <Text>{perkContent}</Text>
+      {perkContent instanceof Object ? perkContent : <Text>{perkContent}</Text>}
     </Stack>
   )
 }

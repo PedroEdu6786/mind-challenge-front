@@ -15,7 +15,6 @@ import { useSortData } from 'hooks/useSortData'
 
 const TeamLogs = ({ logs }) => {
   const [newLogs, SortDropdown] = useSortData(logs)
-  console.log(newLogs)
 
   return (
     <>

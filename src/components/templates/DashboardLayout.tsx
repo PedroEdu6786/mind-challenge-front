@@ -30,7 +30,7 @@ const DashboardLayout: FC<StackProps> = ({ children, ...rest }) => {
         spacing="2rem"
         px={{ md: '1rem', lg: '1.5rem' }}
       >
-        <Logo w="10vw" minW="70px" maxW="150px" />
+        <Logo data-testid="logo" w="10vw" minW="70px" maxW="150px" />
         <List color={WHITE_FONT} spacing="1.5rem">
           <NavItem>
             <NavText path="/dashboard">Home</NavText>

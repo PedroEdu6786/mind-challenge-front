@@ -10,8 +10,8 @@ export const teamService = Object.freeze({
 
 const createTeam = async ({ teamData, config }: ITeamCreateAxios) => {
   try {
-    const { idAccount } = teamData
-    const payload = { idAccount }
+    const { accountId } = teamData
+    const payload = { accountId }
     const res = await axios.post(`/teams`, payload, {
       headers: { Authorization: `Bearer ${teamData.token}` },
       ...config,
@@ -26,7 +26,7 @@ const createTeam = async ({ teamData, config }: ITeamCreateAxios) => {
 
 const fetchAllTeams = async ({ teamData }: ITeamCreateAxios) => {
   try {
-    const res = await axios.get(`/teams?accountId=${teamData.idAccount}`, {
+    const res = await axios.get(`/teams?accountId=${teamData.accountId}`, {
       headers: { Authorization: `Bearer ${teamData.token}` },
     })
     const { data } = await res
@@ -39,7 +39,7 @@ const fetchAllTeams = async ({ teamData }: ITeamCreateAxios) => {
 
 const fetchTeamMembers = async ({ teamData }: ITeamCreateAxios) => {
   try {
-    const res = await axios.get(`/members?teamId=${teamData.idAccount}`, {
+    const res = await axios.get(`/members?teamId=${teamData.accountId}`, {
       headers: { Authorization: `Bearer ${teamData.token}` },
     })
     const { data } = await res

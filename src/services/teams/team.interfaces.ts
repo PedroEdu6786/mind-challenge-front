@@ -3,7 +3,7 @@ import AxiosConfig from 'services/axiosConfig'
 interface ITeamCreate {
   id?: number
   token: string
-  idAccount?: number
+  accountId?: number
 }
 export interface ITeamCreateAxios extends AxiosConfig {
   teamData: ITeamCreate

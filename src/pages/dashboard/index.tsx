@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Avatar, Center, Heading, Stack, Text } from '@chakra-ui/react'
 
 import DashboardLayout from 'components/templates/DashboardLayout'
-import useUserAuth from 'hooks/useUserAuth'
 import { UserPerk } from 'components/molecules/UserPerk'
 import { CvLink } from 'components/molecules/CvLink'
 import { UserSkills } from 'components/molecules/UserSkills'
-import { userService } from 'services/user'
 import useProtectedRoute from 'hooks/useProtectedRoute'
-import { IUser } from 'dtos/user'
-
-const initialState: IUser = null
+import useUserFetch from 'hooks/useUserFetch'
 
 const Dashboard = () => {
-  const [authData] = useUserAuth()
-  const [userInfo, setUserInfo] = useState<IUser>(initialState)
   useProtectedRoute()
+  const { userInfo, isAdmin } = useUserFetch()
 
-  const { userData } = authData
-  useEffect(() => {
-    if (!userInfo && userData) {
-      const fetchData = { id: userData.id, token: authData.token }
-      userService
-        .fetchUser({ userData: fetchData, remember: true })
-        .then((data: IUser) => {
-          setUserInfo(data)
-        })
-    }
-  }, [userData, authData, userInfo])
-
-  const parsedSkills = []
+  const parsedSkills: string[] =
+    userInfo && userInfo['skills'] ? userInfo.skills.split(', ') : []
 
   return (
     <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
@@ -45,11 +29,11 @@ const Dashboard = () => {
             {/*  */}
             <Stack>
               <Avatar
-                src={`https://avatars.dicebear.com/api/jdenticon/${'tesft'}.svg`}
+                src={`https://avatars.dicebear.com/api/jdenticon/${userInfo.email}.svg`}
                 boxSize={{ base: '150px', md: '200px', lg: '300px' }}
               />
               <Stack spacing=".1rem">
-                {authData.isAdmin && (
+                {isAdmin && (
                   <Text
                     fontSize={{ base: 'sm', md: 'md' }}
                     fontWeight="semibold"

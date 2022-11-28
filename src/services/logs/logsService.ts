@@ -7,7 +7,7 @@ export const logsService = Object.freeze({
 
 const getLogsByAccount = async ({ logsData }: ILogsCreateAxios) => {
   try {
-    const res = await axios.get(`/logs?accountId=${logsData.idAccount}`, {
+    const res = await axios.get(`/logs?accountId=${logsData.accountId}`, {
       headers: { Authorization: `Bearer ${logsData.token}` },
     })
     const { data } = await res

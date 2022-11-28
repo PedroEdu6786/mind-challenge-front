@@ -29,6 +29,7 @@ const TeamMembers = ({
             Add Member
           </Button>
           <Button
+            data-testid="delete-team"
             isDisabled={Boolean(!selectedTeam)}
             onClick={handleDeleteTeam}
             variant="outline"
@@ -60,6 +61,7 @@ const TeamMembers = ({
                   </Td>
                   <Td>
                     <Button
+                      data-testid="delete-member"
                       colorScheme="red"
                       variant="outline"
                       onClick={() => handleDeleteMember(user.id)}
