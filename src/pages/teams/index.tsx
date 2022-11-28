@@ -59,6 +59,7 @@ const Teams = () => {
           if (teamId) handleFetchTeam(teamId)
         })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, authData, teamsInfo, userData])
 
   const handleCreateTeam = async () => {

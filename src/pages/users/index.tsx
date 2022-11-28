@@ -4,6 +4,7 @@ import {
   Heading,
   Menu,
   MenuButton,
+  Link as LinkC,
   MenuItem,
   MenuList,
   Stack,
@@ -21,12 +22,12 @@ import DashboardLayout from 'components/templates/DashboardLayout'
 import useAdminRoute from 'hooks/useAdminRoute'
 import { LIGHT_GRAY } from 'constants/colors'
 import useUserAuth from 'hooks/useUserAuth'
-import { Link } from 'components/atoms/Link'
 import UserRegister from 'components/organisms/UserRegister'
 import { userService } from 'services/user'
 import { EnglishLevel, IUser } from 'dtos/user'
 import useToast from 'hooks/useToast'
 import { UserAction, UserContext } from 'context/users/UserContext'
+import UserInfo from 'components/organisms/UserInfo'
 
 const initValue: IUser = {
   name: '',
@@ -49,7 +50,9 @@ const User = () => {
   const [authData] = useUserAuth()
   const [isUpdate, setIsUpdate] = useState(false)
   const [selectedUser, setSelectedUser] = useState<IUser>(initValue)
+  const [selectedInfo, setSelectedInfo] = useState<IUser>(initValue)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const drawerHandler = useDisclosure()
   const { callFailToast, callSuccessToast } = useToast()
   const { state, dispatch } = useContext(UserContext)
 
@@ -89,8 +92,14 @@ const User = () => {
     onClose()
   }
 
+  const handleUserInfo = (user: IUser) => {
+    setSelectedInfo(user)
+    drawerHandler.onOpen()
+  }
+
   return (
     <DashboardLayout px={{ base: '.25rem', sm: '.5rem', md: '2rem' }} py="3rem">
+      <UserInfo drawerHandler={drawerHandler} selectedUser={selectedInfo} />
       <UserRegister
         isOpen={isOpen}
         onClose={handleClose}
@@ -130,8 +139,8 @@ const User = () => {
                     <Td>{user.email}</Td>
                     <Td>{user.englishLevel}</Td>
                     <Td>{user.cvLink}</Td>
-                    <Td>
-                      <Link to={`${user.id}`}>Ver más</Link>
+                    <Td onClick={() => handleUserInfo(user)}>
+                      <LinkC color="blue.500">Ver más</LinkC>
                     </Td>
                     <Td>
                       <Menu>

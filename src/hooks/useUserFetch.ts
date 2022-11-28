@@ -9,7 +9,7 @@ const useUserFetch = () => {
   const [authData] = useUserAuth()
   const [userInfo, setUserInfo] = useState<IUser>(initialState)
 
-  const { userData, isAdmin } = authData
+  const { userData } = authData
   useEffect(() => {
     if (!userInfo && userData) {
       const fetchData = { id: userData.id, token: authData.token }
@@ -21,7 +21,7 @@ const useUserFetch = () => {
     }
   }, [userData, authData, userInfo])
 
-  return { userInfo, isAdmin }
+  return { userInfo }
 }
 
 export default useUserFetch
